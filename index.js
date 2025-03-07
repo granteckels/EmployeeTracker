@@ -63,6 +63,23 @@ async function ViewAllDepartments() {
     console.log(table.toString());
 }
 
+async function AddDepartment() {
+    return inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'department',
+                message: 'What is the name of the department?',
+            }
+        ])
+        .then((answer) => {
+            const query = "INSERT INTO department (name)\n"
+                + `VALUES ('${answer.department}')`;
+            
+            client.query(query);
+        })
+}
+
 class Cli {
     constructor() {
         this.exit = false;
@@ -109,7 +126,7 @@ class Cli {
                         ViewAllDepartments().then(() => this.startCli());
                         break;
                     case 'Add Department':
-                        console.log('AD');
+                        AddDepartment().then(() => this.startCli());
                         break;
                     case 'Exit':
                         client.end();
