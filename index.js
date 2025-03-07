@@ -195,11 +195,9 @@ class Cli {
                 }
             ])
             .then((answer) => {
-                // console.log(answer)
                 switch (answer.action) {
                     case 'View All Employees':
                         ViewAllEmployees().then((result) => {
-
                             const table = new cliTable({
                                 head: ['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'],
                                 colWidths: [5, 20, 20, 40, 15, 10, 40],
@@ -221,7 +219,6 @@ class Cli {
                         break;
                     case 'View All Roles':
                         ViewAllRoles().then((result) => {
-
                             const table = new cliTable({
                                 head: ['id', 'title', 'salary', 'department'],
                                 colWidths: [5, 40, 10, 15],
