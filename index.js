@@ -33,33 +33,34 @@ async function ViewAllRoles() {
 
 async function AddRole() {
     const departments = await ViewAllDepartments();
-    console.log(departments);
+    const departmentNames = departments.map(row => row.name);
 
-    // return inquirer
-    //     .prompt([
-    //         {
-    //             type: 'input',
-    //             name: 'name',
-    //             message: 'What is the name of the role?',
-    //         },
-    //         {
-    //             type: 'input',
-    //             name: 'salary',
-    //             message: 'What is the salary of the role?',
-    //         },
-    //         {
-    //             type: 'list',
-    //             name: 'department',
-    //             message: 'Which department does the role belong to?',
-    //             choices: []
-    //         }
-    //     ])
-    //     .then((answer) => {
-    //         const query = "INSERT INTO department (name)\n"
-    //             + `VALUES ('${answer.department}')`;
-            
-    //         client.query(query);
-    //     })
+    return inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'title',
+                message: 'What is the name of the role?',
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'What is the salary of the role?',
+            },
+            {
+                type: 'list',
+                name: 'department',
+                message: 'Which department does the role belong to?',
+                choices: departmentNames
+            }
+        ])
+        .then((answer) => {
+            const departmentId = departments.find(row => row.name === answer.department).id;
+            const query = "INSERT INTO role (title, salary, department)\n"
+                + `VALUES ('${answer.title}', ${answer.salary}, ${departmentId})`;
+
+            client.query(query);
+        })
 }
 
 async function ViewAllDepartments() {
