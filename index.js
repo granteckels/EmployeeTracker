@@ -7,20 +7,30 @@ const client = new Client({
     password: 'employee_tracker',
     database: 'employee_tracker',
 })
+await client.connect();
 
 async function ViewAllEmployees() {
     const query = "SELECT * FROM department"
 
-    await client.connect();
-
     const result = await client.query(query);
-    console.log('id department');
+    console.log('\nid department');
     console.log('-- ----------');
     result.rows.forEach(row => {
         console.log(`${row.id} ${row.name}`);
     });
+    console.log('');
+}
 
-    await client.end();
+async function ViewAllRoles() {
+    const query = "SELECT * FROM role"
+
+    const result = await client.query(query);
+    console.log('\nid title salary department');
+    console.log('-- ----- ------ ----------');
+    result.rows.forEach(row => {
+        console.log(`${row.id} ${row.title} ${row.salary} ${row.department}`);
+    });
+    console.log('');
 }
 
 class Cli {
@@ -60,7 +70,7 @@ class Cli {
                         console.log('UER');
                         break;
                     case 'View All Roles':
-                        console.log('VAR');
+                        ViewAllRoles().then(() => this.startCli());
                         break;
                     case 'Add Role':
                         console.log('AR');
@@ -72,6 +82,7 @@ class Cli {
                         console.log('AD');
                         break;
                     case 'Exit':
+                        client.end();
                         process.exit();
                         break;
                 }
