@@ -22,6 +22,38 @@ async function ViewAllEmployees() {
     return result.rows;
 }
 
+async function UpdateEmployeeRole() {
+    const employees = await ViewAllEmployees();
+    const employeeNames = employees.map(row => row.first_name + ' ' + row.last_name);
+
+    const roles = await ViewAllRoles();
+    const roleTitles = roles.map(row => row.title);
+
+    return inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'employeeName',
+                message: 'Which employee\'s role do you want to update?',
+                choices: employeeNames
+            },
+            {
+                type: 'list',
+                name: 'roleTitle',
+                message: 'Which role do you want to assign the selected employee?',
+                choices: roleTitles
+            }
+        ])
+        .then((answer) => {
+            const [first_name, last_name] = answer.employeeName.split(' ');
+            const employeeId = employees.find(row => row.first_name === first_name && row.last_name === last_name).id;
+            const roleId = roles.find(row => row.title === answer.roleTitle).id;
+            const query = `UPDATE employee SET role_id=${roleId} WHERE id=${employeeId}`;
+
+            client.query(query);
+        })
+}
+
 async function ViewAllRoles() {
     const query = "SELECT role.id, title, salary, department.name as department FROM role\n"
         + "JOIN department ON department = department.id";
@@ -135,7 +167,7 @@ class Cli {
                         console.log('AE');
                         break;
                     case 'Update Employee Role':
-                        console.log('UER');
+                        UpdateEmployeeRole().then(() =>this.startCli());
                         break;
                     case 'View All Roles':
                         ViewAllRoles().then((result) => {
