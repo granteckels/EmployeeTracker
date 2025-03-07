@@ -22,6 +22,56 @@ async function ViewAllEmployees() {
     return result.rows;
 }
 
+async function AddEmployee() {
+    const employees = await ViewAllEmployees();
+    const employeeNames = employees.map(row => row.first_name + ' ' + row.last_name);
+    employeeNames.unshift('None');
+
+    const roles = await ViewAllRoles();
+    const roleTitles = roles.map(row => row.title);
+
+    return inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'firstName',
+                message: 'What is the employee\'s first name?'
+            },
+            {
+                type: 'input',
+                name: 'lastName',
+                message: 'What is the employee\'s last name?'
+            },
+            {
+                type: 'list',
+                name: 'roleTitle',
+                message: 'What is the employee\'s role?',
+                choices: roleTitles
+            },
+            {
+                type: 'list',
+                name: 'managerName',
+                message: 'Who is th employee\'s manager?',
+                choices: employeeNames
+            },
+        ])
+        .then((answer) => {
+            let managerId;
+            if(answer.managerName !== 'None') {
+                const [manager_first_name, manager_last_name] = answer.managerName.split(' ');
+                managerId = employees.find(row => row.first_name === manager_first_name && row.last_name === manager_last_name).id;
+            } else {
+                managerId = 'NULL';
+            }
+            const roleId = roles.find(row => row.title === answer.roleTitle).id;
+            const query = "INSERT INTO employee (first_name, last_name, role_id, manager_id)\n"
+                + `VALUES ('${answer.firstName}', '${answer.lastName}', ${roleId}, ${managerId})`;
+
+            console.log(query);
+            client.query(query);
+        })
+}
+
 async function UpdateEmployeeRole() {
     const employees = await ViewAllEmployees();
     const employeeNames = employees.map(row => row.first_name + ' ' + row.last_name);
@@ -164,10 +214,10 @@ class Cli {
                         });
                         break;
                     case 'Add Employee':
-                        console.log('AE');
+                        AddEmployee().then(() => this.startCli());
                         break;
                     case 'Update Employee Role':
-                        UpdateEmployeeRole().then(() =>this.startCli());
+                        UpdateEmployeeRole().then(() => this.startCli());
                         break;
                     case 'View All Roles':
                         ViewAllRoles().then((result) => {
