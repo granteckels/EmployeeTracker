@@ -11,22 +11,6 @@ const client = new Client({
 })
 await client.connect();
 
-async function ViewAllEmployees() {
-    const query = "SELECT * FROM department"
-
-    const result = await client.query(query);
-
-    const table = new cliTable({
-        head: ['id', 'department'],
-        colWidths: [5, 15],
-    });
-    result.rows.forEach(row => {
-        table.push([row.id, row.name]);
-    });
-
-    console.log(table.toString());
-}
-
 async function ViewAllRoles() {
     const query = "SELECT role.id, title, salary, department.name as department FROM role\n"
         + "JOIN department ON department = department.id";
@@ -39,6 +23,22 @@ async function ViewAllRoles() {
     });
     result.rows.forEach(row => {
         table.push([row.id, row.title, row.salary, row.department]);
+    });
+
+    console.log(table.toString());
+}
+
+async function ViewAllDepartments() {
+    const query = "SELECT * FROM department"
+
+    const result = await client.query(query);
+
+    const table = new cliTable({
+        head: ['id', 'department'],
+        colWidths: [5, 15],
+    });
+    result.rows.forEach(row => {
+        table.push([row.id, row.name]);
     });
 
     console.log(table.toString());
@@ -72,7 +72,7 @@ class Cli {
                 // console.log(answer)
                 switch (answer.action) {
                     case 'View All Employees':
-                        ViewAllEmployees().then(() => this.startCli());
+                        console.log('VAE');
                         break;
                     case 'Add Employee':
                         console.log('AE');
@@ -87,7 +87,7 @@ class Cli {
                         console.log('AR');
                         break;
                     case 'View All Departments':
-                        console.log('VAD');
+                        ViewAllDepartments().then(() => this.startCli());
                         break;
                     case 'Add Department':
                         console.log('AD');
