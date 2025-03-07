@@ -1,5 +1,7 @@
 import inquirer from "inquirer";
 import pg from 'pg';
+import cliTable from 'cli-table3';
+
 const { Client } = pg
 
 const client = new Client({
@@ -13,24 +15,33 @@ async function ViewAllEmployees() {
     const query = "SELECT * FROM department"
 
     const result = await client.query(query);
-    console.log('\nid department');
-    console.log('-- ----------');
-    result.rows.forEach(row => {
-        console.log(`${row.id} ${row.name}`);
+
+    const table = new cliTable({
+        head: ['id', 'department'],
+        colWidths: [5, 15],
     });
-    console.log('');
+    result.rows.forEach(row => {
+        table.push([row.id, row.name]);
+    });
+
+    console.log(table.toString());
 }
 
 async function ViewAllRoles() {
-    const query = "SELECT * FROM role"
+    const query = "SELECT role.id, title, salary, department.name as department FROM role\n"
+        + "JOIN department ON department = department.id";
 
     const result = await client.query(query);
-    console.log('\nid title salary department');
-    console.log('-- ----- ------ ----------');
-    result.rows.forEach(row => {
-        console.log(`${row.id} ${row.title} ${row.salary} ${row.department}`);
+
+    const table = new cliTable({
+        head: ['id', 'title', 'salary', 'department'],
+        colWidths: [5, 25, 10, 15],
     });
-    console.log('');
+    result.rows.forEach(row => {
+        table.push([row.id, row.title, row.salary, row.department]);
+    });
+
+    console.log(table.toString());
 }
 
 class Cli {
