@@ -7,12 +7,20 @@ const client = new Client({
     password: 'employee_tracker',
     database: 'employee_tracker',
 })
-await client.connect()
 
 async function ViewAllEmployees() {
     const query = "SELECT * FROM department"
+
+    await client.connect();
+
     const result = await client.query(query);
-    console.log(result.rows);
+    console.log('id department');
+    console.log('-- ----------');
+    result.rows.forEach(row => {
+        console.log(`${row.id} ${row.name}`);
+    });
+
+    await client.end();
 }
 
 class Cli {
@@ -40,7 +48,7 @@ class Cli {
                 }
             ])
             .then((answer) => {
-                console.log(answer)
+                // console.log(answer)
                 switch (answer.action) {
                     case 'View All Employees':
                         ViewAllEmployees().then(() => this.startCli());
@@ -64,7 +72,6 @@ class Cli {
                         console.log('AD');
                         break;
                     case 'Exit':
-                        // await client.end()
                         process.exit();
                         break;
                 }
