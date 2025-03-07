@@ -19,15 +19,7 @@ async function ViewAllEmployees() {
 
     const result = await client.query(query);
 
-    const table = new cliTable({
-        head: ['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'],
-        colWidths: [5, 20, 20, 40, 15, 10, 40],
-    });
-    result.rows.forEach(row => {
-        table.push([row.id, row.first_name, row.last_name, row.title, row.department, row.salary, row.manager]);
-    });
-
-    console.log(table.toString());
+    return result.rows;
 }
 
 async function ViewAllRoles() {
@@ -36,15 +28,38 @@ async function ViewAllRoles() {
 
     const result = await client.query(query);
 
-    const table = new cliTable({
-        head: ['id', 'title', 'salary', 'department'],
-        colWidths: [5, 40, 10, 15],
-    });
-    result.rows.forEach(row => {
-        table.push([row.id, row.title, row.salary, row.department]);
-    });
+    return result.rows;
+}
 
-    console.log(table.toString());
+async function AddRole() {
+    const departments = await ViewAllDepartments();
+    console.log(departments);
+
+    // return inquirer
+    //     .prompt([
+    //         {
+    //             type: 'input',
+    //             name: 'name',
+    //             message: 'What is the name of the role?',
+    //         },
+    //         {
+    //             type: 'input',
+    //             name: 'salary',
+    //             message: 'What is the salary of the role?',
+    //         },
+    //         {
+    //             type: 'list',
+    //             name: 'department',
+    //             message: 'Which department does the role belong to?',
+    //             choices: []
+    //         }
+    //     ])
+    //     .then((answer) => {
+    //         const query = "INSERT INTO department (name)\n"
+    //             + `VALUES ('${answer.department}')`;
+            
+    //         client.query(query);
+    //     })
 }
 
 async function ViewAllDepartments() {
@@ -52,15 +67,7 @@ async function ViewAllDepartments() {
 
     const result = await client.query(query);
 
-    const table = new cliTable({
-        head: ['id', 'department'],
-        colWidths: [5, 15],
-    });
-    result.rows.forEach(row => {
-        table.push([row.id, row.name]);
-    });
-
-    console.log(table.toString());
+    return result.rows;
 }
 
 async function AddDepartment() {
@@ -108,7 +115,20 @@ class Cli {
                 // console.log(answer)
                 switch (answer.action) {
                     case 'View All Employees':
-                        ViewAllEmployees().then(() => this.startCli());
+                        ViewAllEmployees().then((result) => {
+
+                            const table = new cliTable({
+                                head: ['id', 'first_name', 'last_name', 'title', 'department', 'salary', 'manager'],
+                                colWidths: [5, 20, 20, 40, 15, 10, 40],
+                            });
+                            result.forEach(row => {
+                                table.push([row.id, row.first_name, row.last_name, row.title, row.department, row.salary, row.manager]);
+                            });
+                        
+                            console.log(table.toString());
+                            
+                            this.startCli();
+                        });
                         break;
                     case 'Add Employee':
                         console.log('AE');
@@ -117,13 +137,38 @@ class Cli {
                         console.log('UER');
                         break;
                     case 'View All Roles':
-                        ViewAllRoles().then(() => this.startCli());
+                        ViewAllRoles().then((result) => {
+
+                            const table = new cliTable({
+                                head: ['id', 'title', 'salary', 'department'],
+                                colWidths: [5, 40, 10, 15],
+                            });
+                            result.forEach(row => {
+                                table.push([row.id, row.title, row.salary, row.department]);
+                            });
+                        
+                            console.log(table.toString());
+                            
+                            this.startCli();
+                        });
                         break;
                     case 'Add Role':
-                        console.log('AR');
+                        AddRole().then(() => this.startCli());
                         break;
                     case 'View All Departments':
-                        ViewAllDepartments().then(() => this.startCli());
+                        ViewAllDepartments().then((result) => {
+                            const table = new cliTable({
+                                head: ['id', 'department'],
+                                colWidths: [5, 15],
+                            });
+                            result.forEach(row => {
+                                table.push([row.id, row.name]);
+                            });
+                        
+                            console.log(table.toString())
+
+                            this.startCli();
+                        });
                         break;
                     case 'Add Department':
                         AddDepartment().then(() => this.startCli());
